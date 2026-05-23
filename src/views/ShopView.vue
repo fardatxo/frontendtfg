@@ -9,18 +9,25 @@ const { items, cartCount, cartTotal, addToCart: addItem, removeFromCart, updateQ
 
 const products = ref([])
 const loading = ref(true)
+const loadError = ref('')
 const categories = ['Todos', 'Cabello', 'Barba']
 const activeCategory = ref('Todos')
 const addedId = ref(null)
 
-onMounted(async () => {
+const fetchProducts = async () => {
+  loading.value = true
+  loadError.value = ''
   try {
     const { data } = await api.get('/products')
     products.value = data
+  } catch {
+    loadError.value = 'No se pudieron cargar los productos. Inténtalo de nuevo.'
   } finally {
     loading.value = false
   }
-})
+}
+
+onMounted(fetchProducts)
 
 const filtered = computed(() => {
   if (activeCategory.value === 'Todos') return products.value
@@ -58,6 +65,12 @@ const addToCart = (product) => {
       <!-- Loading -->
       <div v-if="loading" class="loading-grid">
         <div v-for="n in 8" :key="n" class="skeleton-card"></div>
+      </div>
+
+      <!-- Load error -->
+      <div v-else-if="loadError" class="load-error">
+        <p>{{ loadError }}</p>
+        <button class="btn-primary" @click="fetchProducts">Reintentar</button>
       </div>
 
       <div v-else class="shop-layout">
@@ -141,6 +154,16 @@ const addToCart = (product) => {
 }
 .filter-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
 .filter-btn.active { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+
+.load-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 0;
+  text-align: center;
+  color: var(--color-text-muted);
+}
 
 /* Skeleton loader */
 .loading-grid {

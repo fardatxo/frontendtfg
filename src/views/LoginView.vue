@@ -17,6 +17,10 @@ const submit = async () => {
     error.value = 'Por favor, completa todos los campos.'
     return
   }
+  if (mode.value === 'register' && !form.value.name) {
+    error.value = 'El nombre es obligatorio.'
+    return
+  }
   if (mode.value === 'register' && form.value.password !== form.value.confirmPassword) {
     error.value = 'Las contraseñas no coinciden.'
     return
@@ -26,7 +30,6 @@ const submit = async () => {
     if (mode.value === 'login') {
       await login(form.value.email, form.value.password)
     } else {
-      if (!form.value.name) { error.value = 'El nombre es obligatorio.'; return }
       await register(form.value.name, form.value.email, form.value.password)
     }
     router.push('/')

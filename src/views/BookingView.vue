@@ -33,10 +33,12 @@ const today = new Date().toISOString().split('T')[0]
 
 const selectedService = computed(() => services.find(s => s.id === form.value.service))
 
+const emailValid = computed(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.email))
+
 const canNext = computed(() => {
   if (step.value === 1) return !!form.value.service
   if (step.value === 2) return form.value.date && form.value.time
-  if (step.value === 3) return form.value.name && form.value.phone && form.value.email
+  if (step.value === 3) return form.value.name && form.value.phone && emailValid.value
   return false
 })
 
@@ -61,7 +63,7 @@ const submitBooking = async () => {
     })
     submitted.value = true
   } catch (e) {
-    apiError.value = 'No se pudo guardar la reserva. Inténtalo de nuevo.'
+    apiError.value = e?.response?.data?.message || 'No se pudo guardar la reserva. Inténtalo de nuevo.'
   } finally {
     loading.value = false
   }

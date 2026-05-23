@@ -15,7 +15,7 @@ const submit = async () => {
     await api.post('/contact', form.value)
     submitted.value = true
   } catch (e) {
-    error.value = 'No se pudo enviar el mensaje. Inténtalo de nuevo.'
+    error.value = e?.response?.data?.message || 'No se pudo enviar el mensaje. Inténtalo de nuevo.'
   } finally {
     loading.value = false
   }
